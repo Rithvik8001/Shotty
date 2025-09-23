@@ -8,7 +8,14 @@ import bcrypt from "bcrypt";
 export const signupUser = async (req: Request, res: Response) => {
   const result = validateSignup(req.body);
   if (!result.success) {
-    return res.status(400).json({ error: result.error.message });
+    return res.status(400).json({
+      error: result.error.message,
+      details: result.error.issues.map((issue) => ({
+        field: issue.path.join("."),
+        message: issue.message,
+        code: issue.code,
+      })),
+    });
   }
   try {
     const user = await User.findOne({ emailId: result.data.emailId });
