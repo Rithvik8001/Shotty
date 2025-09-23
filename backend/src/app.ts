@@ -2,8 +2,14 @@ import express, { type Express } from "express";
 import connectDB from "./db/config/db.ts";
 import dotenv from "dotenv";
 dotenv.config();
-
+import userRoute from "./routes/user/route.ts";
 const app: Express = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// routes
+app.use(userRoute);
 
 connectDB()
   .then(() => {
