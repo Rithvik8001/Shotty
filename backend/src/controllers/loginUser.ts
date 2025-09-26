@@ -32,6 +32,7 @@ export const loginUser = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Invalid password" });
     }
     const resultData = {
+      userId: user._id,
       name: user.name,
       emailId: user.emailId,
     };
@@ -40,7 +41,7 @@ export const loginUser = async (req: Request, res: Response) => {
       { userId: user._id },
       process.env.JWT_SECRET_KEY as string,
       {
-        expiresIn: "1h",
+        expiresIn: "1d",
       }
     );
     res.cookie("token", token, {

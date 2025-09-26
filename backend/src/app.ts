@@ -4,9 +4,18 @@ import dotenv from "dotenv";
 dotenv.config();
 import userRoute from "./routes/user/route.ts";
 const app: Express = express();
-
+import cookieParser from "cookie-parser";
+import type { Request, Response, NextFunction } from "express";
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
+});
 
 // routes
 app.use(userRoute);
