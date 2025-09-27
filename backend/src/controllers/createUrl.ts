@@ -12,6 +12,24 @@ const generateShortUrl = (): string => {
   return result;
 };
 
+export const getAllUrls = async (req: Request, res: Response) => {
+  try {
+    const urls = await Url.find({ userId: req.user?.userId })
+      .select("originalUrl shortUrl clicks createdAt")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      message: "URLs retrieved successfully",
+      data: urls,
+      count: urls.length,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json(error instanceof Error ? error.message : "Internal server error");
+  }
+};
+
 export const createUrl = async (req: Request, res: Response) => {
   const result = validateCreateUrl(req.body);
   if (!result.success) {
