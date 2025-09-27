@@ -1,5 +1,7 @@
 import { type Request, type Response } from "express";
-import validateCreateUrl from "../validations/createUrlValidation.ts";
+import validateCreateUrl, {
+  validateEditUrl,
+} from "../validations/createUrlValidation.ts";
 import Url from "../db/models/url.ts";
 
 const generateShortUrl = (): string => {
@@ -22,6 +24,75 @@ export const getAllUrls = async (req: Request, res: Response) => {
       message: "URLs retrieved successfully",
       data: urls,
       count: urls.length,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json(error instanceof Error ? error.message : "Internal server error");
+  }
+};
+
+export const deleteUrl = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const deletedUrl = await Url.findOneAndDelete({
+      _id: id,
+      userId: req.user?.userId,
+    });
+
+    if (!deletedUrl) {
+      return res.status(404).json({
+        error: "URL not found or you don't have permission to delete it",
+      });
+    }
+
+    return res.status(200).json({
+      message: "URL deleted successfully",
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json(error instanceof Error ? error.message : "Internal server error");
+  }
+};
+
+export const editUrl = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const result = validateEditUrl(req.body);
+
+    if (!result.success) {
+      return res.status(400).json({
+        error: result.error.message,
+        details: result.error.issues.map((issue) => ({
+          field: issue.path.join("."),
+          message: issue.message,
+          code: issue.code,
+        })),
+      });
+    }
+
+    const { originalUrl } = result.data;
+
+    const updatedUrl = await Url.findOneAndUpdate(
+      {
+        _id: id,
+        userId: req.user?.userId,
+      },
+      { originalUrl },
+      { new: true, select: "originalUrl shortUrl clicks createdAt" }
+    );
+
+    if (!updatedUrl) {
+      return res.status(404).json({
+        error: "URL not found or you don't have permission to edit it",
+      });
+    }
+
+    return res.status(200).json({
+      message: "URL updated successfully",
+      data: updatedUrl,
     });
   } catch (error) {
     return res
