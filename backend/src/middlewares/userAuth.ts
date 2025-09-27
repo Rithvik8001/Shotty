@@ -3,6 +3,10 @@
 import { type Request, type Response, type NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import User from "../db/models/user.ts";
+import {
+  sendErrorResponse,
+  createErrorResponse,
+} from "../utils/errorHandler.ts";
 
 export const userAuth = async (
   req: Request,
@@ -11,7 +15,11 @@ export const userAuth = async (
 ) => {
   const token = req.cookies.token;
   if (!token) {
-    return res.status(401).json({ message: "Unauthorized" });
+    const apiError = createErrorResponse(
+      "Authentication required. Please log in to access this resource",
+      "AUTHENTICATION_REQUIRED"
+    );
+    return sendErrorResponse(res, 401, apiError);
   }
 
   try {
@@ -21,7 +29,11 @@ export const userAuth = async (
 
     const user = await User.findById(decoded.userId);
     if (!user) {
-      return res.status(401).json({ message: "Unauthorized" });
+      const apiError = createErrorResponse(
+        "Invalid authentication token. Please log in again",
+        "INVALID_TOKEN"
+      );
+      return sendErrorResponse(res, 401, apiError);
     }
 
     req.user = {
@@ -32,6 +44,23 @@ export const userAuth = async (
 
     next();
   } catch (error) {
-    return res.status(401).json({ message: "Unauthorized" });
+    let apiError;
+    if (error instanceof jwt.JsonWebTokenError) {
+      apiError = createErrorResponse(
+        "Invalid authentication token. Please log in again",
+        "INVALID_TOKEN"
+      );
+    } else if (error instanceof jwt.TokenExpiredError) {
+      apiError = createErrorResponse(
+        "Your session has expired. Please log in again",
+        "TOKEN_EXPIRED"
+      );
+    } else {
+      apiError = createErrorResponse(
+        "Authentication failed. Please log in again",
+        "AUTHENTICATION_FAILED"
+      );
+    }
+    return sendErrorResponse(res, 401, apiError);
   }
 };

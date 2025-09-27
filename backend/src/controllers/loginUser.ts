@@ -5,31 +5,41 @@ import validateLogin from "../validations/loginValidation.ts";
 import User from "../db/models/user.ts";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import {
+  handleZodError,
+  handleDatabaseError,
+  sendErrorResponse,
+  sendSuccessResponse,
+  createSuccessResponse,
+  createErrorResponse,
+} from "../utils/errorHandler.ts";
 
 export const loginUser = async (req: Request, res: Response) => {
   const result = validateLogin(req.body);
   if (!result.success) {
-    return res.status(400).json({
-      error: result.error.message,
-      details: result.error.issues.map((issue) => ({
-        field: issue.path.join("."),
-        message: issue.message,
-        code: issue.code,
-      })),
-    });
+    const apiError = handleZodError(result.error);
+    return sendErrorResponse(res, 400, apiError);
   }
 
   try {
     const user = await User.findOne({ emailId: result.data.emailId });
     if (!user) {
-      return res.status(400).json({ error: "User not found" });
+      const apiError = createErrorResponse(
+        "No account found with this email address",
+        "USER_NOT_FOUND"
+      );
+      return sendErrorResponse(res, 401, apiError);
     }
     const isPasswordValid = await bcrypt.compare(
       result.data.password,
       user.password
     );
     if (!isPasswordValid) {
-      return res.status(400).json({ error: "Invalid password" });
+      const apiError = createErrorResponse(
+        "Invalid password. Please check your credentials and try again",
+        "INVALID_CREDENTIALS"
+      );
+      return sendErrorResponse(res, 401, apiError);
     }
     const resultData = {
       userId: user._id,
@@ -49,13 +59,13 @@ export const loginUser = async (req: Request, res: Response) => {
       expires: new Date(Date.now() + 8 * 3600000),
     });
 
-    return res.status(200).json({
-      message: "Login successful",
-      data: resultData,
-    });
+    return sendSuccessResponse(
+      res,
+      200,
+      createSuccessResponse("Login successful", resultData)
+    );
   } catch (error) {
-    return res
-      .status(500)
-      .json(error instanceof Error ? error.message : "Internal server error");
+    const apiError = handleDatabaseError(error);
+    return sendErrorResponse(res, 500, apiError);
   }
 };

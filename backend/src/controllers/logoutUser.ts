@@ -1,12 +1,24 @@
 import { type Request, type Response } from "express";
+import {
+  sendErrorResponse,
+  sendSuccessResponse,
+  createSuccessResponse,
+  createErrorResponse,
+} from "../utils/errorHandler.ts";
 
 export const logoutUser = async (req: Request, res: Response) => {
   if (!req.cookies.token) {
-    return res.status(400).json({ message: "User not logged in" });
+    const apiError = createErrorResponse(
+      "No active session found. You are not currently logged in",
+      "NOT_LOGGED_IN"
+    );
+    return sendErrorResponse(res, 400, apiError);
   }
 
   res.clearCookie("token");
-  return res.status(200).json({
-    message: "Logged out successfully",
-  });
+  return sendSuccessResponse(
+    res,
+    200,
+    createSuccessResponse("Logged out successfully")
+  );
 };

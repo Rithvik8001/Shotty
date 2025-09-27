@@ -3,6 +3,14 @@ import validateCreateUrl, {
   validateEditUrl,
 } from "../validations/createUrlValidation.ts";
 import Url from "../db/models/url.ts";
+import {
+  handleZodError,
+  handleDatabaseError,
+  sendErrorResponse,
+  sendSuccessResponse,
+  createSuccessResponse,
+  createErrorResponse,
+} from "../utils/errorHandler.ts";
 
 const generateShortUrl = (): string => {
   const characters =
@@ -17,18 +25,17 @@ const generateShortUrl = (): string => {
 export const getAllUrls = async (req: Request, res: Response) => {
   try {
     const urls = await Url.find({ userId: req.user?.userId })
-      .select("originalUrl shortUrl clicks createdAt")
+      .select("originalUrl shortUrl clicks createdAt updatedAt")
       .sort({ createdAt: -1 });
 
-    return res.status(200).json({
-      message: "URLs retrieved successfully",
-      data: urls,
-      count: urls.length,
-    });
+    return sendSuccessResponse(
+      res,
+      200,
+      createSuccessResponse("URLs retrieved successfully", urls, urls.length)
+    );
   } catch (error) {
-    return res
-      .status(500)
-      .json(error instanceof Error ? error.message : "Internal server error");
+    const apiError = handleDatabaseError(error);
+    return sendErrorResponse(res, 500, apiError);
   }
 };
 
@@ -42,18 +49,21 @@ export const deleteUrl = async (req: Request, res: Response) => {
     });
 
     if (!deletedUrl) {
-      return res.status(404).json({
-        error: "URL not found or you don't have permission to delete it",
-      });
+      const apiError = createErrorResponse(
+        "URL not found or you don't have permission to delete it",
+        "URL_NOT_FOUND"
+      );
+      return sendErrorResponse(res, 404, apiError);
     }
 
-    return res.status(200).json({
-      message: "URL deleted successfully",
-    });
+    return sendSuccessResponse(
+      res,
+      200,
+      createSuccessResponse("URL deleted successfully")
+    );
   } catch (error) {
-    return res
-      .status(500)
-      .json(error instanceof Error ? error.message : "Internal server error");
+    const apiError = handleDatabaseError(error);
+    return sendErrorResponse(res, 500, apiError);
   }
 };
 
@@ -63,14 +73,8 @@ export const editUrl = async (req: Request, res: Response) => {
     const result = validateEditUrl(req.body);
 
     if (!result.success) {
-      return res.status(400).json({
-        error: result.error.message,
-        details: result.error.issues.map((issue) => ({
-          field: issue.path.join("."),
-          message: issue.message,
-          code: issue.code,
-        })),
-      });
+      const apiError = handleZodError(result.error);
+      return sendErrorResponse(res, 400, apiError);
     }
 
     const { originalUrl } = result.data;
@@ -81,23 +85,25 @@ export const editUrl = async (req: Request, res: Response) => {
         userId: req.user?.userId,
       },
       { originalUrl },
-      { new: true, select: "originalUrl shortUrl clicks createdAt" }
+      { new: true, select: "originalUrl shortUrl clicks createdAt updatedAt" }
     );
 
     if (!updatedUrl) {
-      return res.status(404).json({
-        error: "URL not found or you don't have permission to edit it",
-      });
+      const apiError = createErrorResponse(
+        "URL not found or you don't have permission to edit it",
+        "URL_NOT_FOUND"
+      );
+      return sendErrorResponse(res, 404, apiError);
     }
 
-    return res.status(200).json({
-      message: "URL updated successfully",
-      data: updatedUrl,
-    });
+    return sendSuccessResponse(
+      res,
+      200,
+      createSuccessResponse("URL updated successfully", updatedUrl)
+    );
   } catch (error) {
-    return res
-      .status(500)
-      .json(error instanceof Error ? error.message : "Internal server error");
+    const apiError = handleDatabaseError(error);
+    return sendErrorResponse(res, 500, apiError);
   }
 };
 
@@ -112,30 +118,25 @@ export const redirectUrl = async (req: Request, res: Response) => {
     );
 
     if (!urlDoc) {
-      return res.status(404).json({
-        error: "Short URL not found",
-      });
+      const apiError = createErrorResponse(
+        "Short URL not found",
+        "SHORT_URL_NOT_FOUND"
+      );
+      return sendErrorResponse(res, 404, apiError);
     }
 
     return res.redirect(urlDoc.originalUrl);
   } catch (error) {
-    return res
-      .status(500)
-      .json(error instanceof Error ? error.message : "Internal server error");
+    const apiError = handleDatabaseError(error);
+    return sendErrorResponse(res, 500, apiError);
   }
 };
 
 export const createUrl = async (req: Request, res: Response) => {
   const result = validateCreateUrl(req.body);
   if (!result.success) {
-    return res.status(400).json({
-      error: result.error.message,
-      details: result.error.issues.map((issue) => ({
-        field: issue.path.join("."),
-        message: issue.message,
-        code: issue.code,
-      })),
-    });
+    const apiError = handleZodError(result.error);
+    return sendErrorResponse(res, 400, apiError);
   }
   const { originalUrl } = result.data;
 
@@ -153,9 +154,11 @@ export const createUrl = async (req: Request, res: Response) => {
     } while (!isUnique && attempts < maxAttempts);
 
     if (!isUnique) {
-      return res.status(500).json({
-        error: "Unable to generate unique short URL. Please try again.",
-      });
+      const apiError = createErrorResponse(
+        "Unable to generate unique short URL. Please try again.",
+        "SHORT_URL_GENERATION_FAILED"
+      );
+      return sendErrorResponse(res, 500, apiError);
     }
 
     const newUrl = await Url.create({
@@ -164,17 +167,17 @@ export const createUrl = async (req: Request, res: Response) => {
       userId: req.user?.userId,
     });
 
-    return res.status(201).json({
-      message: "URL created successfully",
-      data: {
+    return sendSuccessResponse(
+      res,
+      201,
+      createSuccessResponse("URL created successfully", {
         shortUrl: newUrl.shortUrl,
         originalUrl: newUrl.originalUrl,
         clicks: newUrl.clicks,
-      },
-    });
+      })
+    );
   } catch (error) {
-    return res
-      .status(500)
-      .json(error instanceof Error ? error.message : "Internal server error");
+    const apiError = handleDatabaseError(error);
+    return sendErrorResponse(res, 500, apiError);
   }
 };

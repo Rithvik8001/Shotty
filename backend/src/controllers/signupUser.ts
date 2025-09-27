@@ -4,23 +4,29 @@ import { type Request, type Response } from "express";
 import validateSignup from "../validations/signupValidation.ts";
 import User from "../db/models/user.ts";
 import bcrypt from "bcrypt";
+import {
+  handleZodError,
+  handleDatabaseError,
+  sendErrorResponse,
+  sendSuccessResponse,
+  createSuccessResponse,
+  createErrorResponse,
+} from "../utils/errorHandler.ts";
 
 export const signupUser = async (req: Request, res: Response) => {
   const result = validateSignup(req.body);
   if (!result.success) {
-    return res.status(400).json({
-      error: result.error.message,
-      details: result.error.issues.map((issue) => ({
-        field: issue.path.join("."),
-        message: issue.message,
-        code: issue.code,
-      })),
-    });
+    const apiError = handleZodError(result.error);
+    return sendErrorResponse(res, 400, apiError);
   }
   try {
     const user = await User.findOne({ emailId: result.data.emailId });
     if (user) {
-      return res.status(400).json({ error: "User already exists" });
+      const apiError = createErrorResponse(
+        "An account with this email address already exists. Please try logging in instead",
+        "EMAIL_ALREADY_EXISTS"
+      );
+      return sendErrorResponse(res, 409, apiError);
     }
     const hashedPassword = await bcrypt.hash(result.data.password, 10);
     const newUser = await User.create({
@@ -28,16 +34,16 @@ export const signupUser = async (req: Request, res: Response) => {
       emailId: result.data.emailId,
       password: hashedPassword,
     });
-    return res.status(201).json({
-      message: "User created successfully",
-      data: {
+    return sendSuccessResponse(
+      res,
+      201,
+      createSuccessResponse("Account created successfully", {
         name: newUser.name,
         emailId: newUser.emailId,
-      },
-    });
+      })
+    );
   } catch (error) {
-    return res
-      .status(500)
-      .json(error instanceof Error ? error.message : "Internal server error");
+    const apiError = handleDatabaseError(error);
+    return sendErrorResponse(res, 500, apiError);
   }
 };
