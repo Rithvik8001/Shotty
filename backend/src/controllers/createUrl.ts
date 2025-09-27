@@ -101,6 +101,30 @@ export const editUrl = async (req: Request, res: Response) => {
   }
 };
 
+export const redirectUrl = async (req: Request, res: Response) => {
+  try {
+    const { shortUrl } = req.params;
+
+    const urlDoc = await Url.findOneAndUpdate(
+      { shortUrl },
+      { $inc: { clicks: 1 } },
+      { new: true }
+    );
+
+    if (!urlDoc) {
+      return res.status(404).json({
+        error: "Short URL not found",
+      });
+    }
+
+    return res.redirect(urlDoc.originalUrl);
+  } catch (error) {
+    return res
+      .status(500)
+      .json(error instanceof Error ? error.message : "Internal server error");
+  }
+};
+
 export const createUrl = async (req: Request, res: Response) => {
   const result = validateCreateUrl(req.body);
   if (!result.success) {
