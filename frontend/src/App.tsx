@@ -1,10 +1,12 @@
-import ShottyLogo from "./components/ShottyLogo";
+import Header from "./components/header/header";
 
 const App = () => {
   return (
-    <div>
-      <ShottyLogo />
-    </div>
+    <>
+      <div className="max-w-5xl w-full border-l border-r h-screen mx-auto">
+        <Header />
+      </div>
+    </>
   );
 };
 
