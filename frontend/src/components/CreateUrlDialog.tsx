@@ -20,10 +20,20 @@ import { ApiError } from "@/services";
 
 interface CreateUrlDialogProps {
   onSuccess: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export default function CreateUrlDialog({ onSuccess }: CreateUrlDialogProps) {
-  const [open, setOpen] = useState(false);
+export default function CreateUrlDialog({
+  onSuccess,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+}: CreateUrlDialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  // Use controlled state if provided, otherwise use internal state
+  const open = controlledOpen ?? internalOpen;
+  const setOpen = controlledOnOpenChange ?? setInternalOpen;
   const [url, setUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -64,6 +74,9 @@ export default function CreateUrlDialog({ onSuccess }: CreateUrlDialogProps) {
         <Button>
           <Plus className="mr-2 h-4 w-4" />
           Create Link
+          <kbd className="ml-2 pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+            C
+          </kbd>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
