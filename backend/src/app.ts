@@ -35,16 +35,22 @@ app.use(urlRoute);
 
 app.get("/:shortUrl", redirectUrl);
 
+// Connect to DB
 connectDB()
   .then(() => {
     console.log("Connected to Database");
-  })
-  .then(() => {
-    app.listen(process.env.PORT, () => {
-      console.log(`Server is running on port ${process.env.PORT}`);
-    });
   })
   .catch((err) => {
     console.log("Error connecting to Database");
     console.log(err);
   });
+
+// Only start server if not in Vercel (serverless)
+if (process.env.VERCEL !== "1") {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+export default app;
