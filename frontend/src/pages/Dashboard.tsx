@@ -34,12 +34,15 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import ShottyLogo from "@/components/ShottyLogo";
 import CreateUrlDialog from "@/components/CreateUrlDialog";
+import EditUrlDialog from "@/components/EditUrlDialog";
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [urls, setUrls] = useState<Url[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [editingUrl, setEditingUrl] = useState<Url | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   useEffect(() => {
     loadUrls();
@@ -88,6 +91,11 @@ export default function Dashboard() {
     } catch {
       toast.error("Failed to delete link");
     }
+  };
+
+  const handleEdit = (url: Url) => {
+    setEditingUrl(url);
+    setIsEditDialogOpen(true);
   };
 
   return (
@@ -215,7 +223,7 @@ export default function Dashboard() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleEdit(url)}>
                               <Pencil className="mr-2 h-4 w-4" />
                               Edit
                             </DropdownMenuItem>
@@ -247,6 +255,13 @@ export default function Dashboard() {
           )}
         </div>
       </main>
+
+      <EditUrlDialog
+        url={editingUrl}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onSuccess={loadUrls}
+      />
     </div>
   );
 }

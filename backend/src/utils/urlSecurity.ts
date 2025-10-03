@@ -1,6 +1,25 @@
 import { URL } from "url";
 
-const TRUSTED_DOMAINS = new Set(["localhost", "127.0.0.1"]);
+const TRUSTED_DOMAINS = new Set([
+  "localhost",
+  "127.0.0.1",
+  // Major tech companies
+  "apple.com",
+  "google.com",
+  "microsoft.com",
+  "amazon.com",
+  "facebook.com",
+  "meta.com",
+  "paypal.com",
+  // Add subdomains
+  "www.apple.com",
+  "www.google.com",
+  "www.microsoft.com",
+  "www.amazon.com",
+  "www.facebook.com",
+  "www.meta.com",
+  "www.paypal.com",
+]);
 
 // List of suspicious TLDs that often host malicious content
 const SUSPICIOUS_TLDS = new Set([
@@ -58,7 +77,7 @@ export function validateRedirectUrl(url: string): UrlValidationResult {
     if (!["http:", "https:"].includes(parsedUrl.protocol)) {
       result.isValid = false;
       result.warnings.push(
-        "Invalid protocol. Only HTTP and HTTPS are allowed.",
+        "Invalid protocol. Only HTTP and HTTPS are allowed."
       );
       result.riskLevel = "high";
       return result;
@@ -77,15 +96,22 @@ export function validateRedirectUrl(url: string): UrlValidationResult {
       result.riskLevel = "medium";
     }
 
-    // Check for phishing keywords in hostname or path
-    const fullUrl = (hostname + path).toLowerCase();
-    const foundKeywords = PHISHING_KEYWORDS.filter((keyword) =>
-      fullUrl.includes(keyword),
-    );
+    // Check for phishing keywords - but be smart about it
+    // Only flag if the keyword appears in a suspicious way (not as the main domain)
+    const foundKeywords = PHISHING_KEYWORDS.filter((keyword) => {
+      // Don't flag if the keyword is the actual domain (e.g., apple.com)
+      if (hostname === `${keyword}.com` || hostname === `www.${keyword}.com`) {
+        return false;
+      }
+      // Flag if keyword appears in subdomain or path suspiciously
+      // e.g., apple-login.example.com or example.com/apple-verify
+      const fullUrl = (hostname + path).toLowerCase();
+      return fullUrl.includes(keyword);
+    });
 
     if (foundKeywords.length > 0) {
       result.warnings.push(
-        `Potential phishing indicators found: ${foundKeywords.join(", ")}`,
+        `Potential phishing indicators found: ${foundKeywords.join(", ")}`
       );
       result.riskLevel = "medium";
     }

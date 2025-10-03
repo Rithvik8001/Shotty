@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+import Redirect from "./pages/Redirect";
 import { Toaster } from "./components/ui/sonner";
 
 const App = () => {
@@ -23,6 +24,8 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          {/* Catch-all route for short URLs */}
+          <Route path="/:shortUrl" element={<Redirect />} />
         </Routes>
         <Toaster />
       </AuthProvider>
