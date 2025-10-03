@@ -51,14 +51,14 @@ const Header = () => {
                 <span className="font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
                   powerful
                 </span>
-                <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-primary/50 to-primary/20 rounded-full"></div>
+                <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-primary/50 to-primary/20 rounded-full block"></span>
               </span>
               ,{" "}
               <span className="relative inline-block">
                 <span className="font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
                   trackable
                 </span>
-                <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-primary/50 to-primary/20 rounded-full"></div>
+                <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-primary/50 to-primary/20 rounded-full block"></span>
               </span>{" "}
               short links
             </p>
