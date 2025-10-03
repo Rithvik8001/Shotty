@@ -8,20 +8,21 @@ export default function Home() {
 
   return (
     <div className="flex flex-col w-full h-full">
-      <Nav />
+      <div className="w-full max-w-5xl mx-auto md:border-l md:border-r min-h-screen flex flex-col">
+        <Nav />
 
-      {/* Hero Section */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-20">
+        {/* Hero Section */}
+        <div className="flex-1 flex flex-col items-center justify-center px-6 py-20">
         <div className="max-w-4xl w-full space-y-8 text-center">
           {/* Main Heading */}
           <div className="space-y-4">
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight">
               Shorten URLs.
               <br />
-              Track Performance.
+              Track Every Click.
             </h1>
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Create short, memorable links and track every click with detailed analytics.
+              Create custom short links and monitor click performance in real-time.
             </p>
           </div>
 
@@ -52,9 +53,9 @@ export default function Home() {
                   <Link2 className="h-6 w-6" />
                 </div>
               </div>
-              <h3 className="font-semibold">Simple & Fast</h3>
+              <h3 className="font-semibold">Custom Short URLs</h3>
               <p className="text-sm text-muted-foreground">
-                Create short links in seconds with our intuitive interface.
+                Generate unique 6-character short links for any URL instantly.
               </p>
             </div>
 
@@ -64,9 +65,9 @@ export default function Home() {
                   <BarChart3 className="h-6 w-6" />
                 </div>
               </div>
-              <h3 className="font-semibold">Track Clicks</h3>
+              <h3 className="font-semibold">Click Analytics</h3>
               <p className="text-sm text-muted-foreground">
-                Monitor your link performance with real-time click tracking.
+                Track clicks in real-time and manage all your links in one dashboard.
               </p>
             </div>
 
@@ -76,13 +77,14 @@ export default function Home() {
                   <Shield className="h-6 w-6" />
                 </div>
               </div>
-              <h3 className="font-semibold">Secure & Reliable</h3>
+              <h3 className="font-semibold">Smart URL Security</h3>
               <p className="text-sm text-muted-foreground">
-                Advanced security checks to protect you from malicious links.
+                Automatic phishing detection and malicious URL warnings before redirect.
               </p>
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

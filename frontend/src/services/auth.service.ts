@@ -14,14 +14,8 @@ export const authService = {
     return api.post<void>("/auth/logout");
   },
 
-  // Check if user is authenticated by attempting to fetch their URLs
-  // If it fails with 401, user is not authenticated
-  checkAuth: async (): Promise<boolean> => {
-    try {
-      await api.get("/url/all");
-      return true;
-    } catch {
-      return false;
-    }
+  // Get current authenticated user
+  me: async () => {
+    return api.get<AuthResponse>("/auth/me");
   },
 };

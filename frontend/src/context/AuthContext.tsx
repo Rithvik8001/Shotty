@@ -36,10 +36,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const isAuth = await authService.checkAuth();
-        if (!isAuth) {
-          setUser(null);
-        }
+        const userData = await authService.me();
+        setUser({
+          userId: userData.userId,
+          name: userData.name,
+          emailId: userData.emailId,
+        });
       } catch {
         setUser(null);
       } finally {

@@ -85,22 +85,17 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-primary/8 via-primary/4 to-transparent rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-40 right-1/4 w-96 h-96 bg-gradient-to-bl from-accent/6 via-accent/3 to-transparent rounded-full blur-3xl animate-pulse delay-1000"></div>
-      </div>
-
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute top-4 left-4"
-        onClick={() => navigate("/")}
-      >
-        <ArrowLeft className="h-5 w-5" />
-      </Button>
-
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-full max-w-5xl md:border-l md:border-r min-h-screen flex items-center justify-center p-4 relative">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-4 left-4"
+          onClick={() => navigate("/")}
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <Card className="w-full max-w-md">
         <CardHeader className="space-y-4 text-center">
           <div className="flex justify-center">
             <ShottyLogo size="lg" />
@@ -186,6 +181,7 @@ export default function Signup() {
           </CardFooter>
         </form>
       </Card>
+    </div>
     </div>
   );
 }
