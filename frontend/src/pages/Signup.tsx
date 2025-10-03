@@ -17,6 +17,7 @@ import { ApiError } from "@/services";
 import ShottyLogo from "@/components/ShottyLogo";
 import { toast } from "sonner";
 import { ZodError } from "zod";
+import { ArrowLeft } from "lucide-react";
 
 export default function Signup() {
   const { signup } = useAuth();
@@ -89,6 +90,15 @@ export default function Signup() {
         <div className="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-primary/8 via-primary/4 to-transparent rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-40 right-1/4 w-96 h-96 bg-gradient-to-bl from-accent/6 via-accent/3 to-transparent rounded-full blur-3xl animate-pulse delay-1000"></div>
       </div>
+
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-4 left-4"
+        onClick={() => navigate("/")}
+      >
+        <ArrowLeft className="h-5 w-5" />
+      </Button>
 
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-4 text-center">

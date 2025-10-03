@@ -50,17 +50,17 @@ export default function Home() {
           <p className="text-xl sm:text-2xl lg:text-3xl text-muted-foreground font-medium max-w-3xl leading-relaxed">
             Transform long URLs into{" "}
             <span className="relative inline-block">
-              <span className="font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+              <span className="font-bold text-foreground">
                 powerful
               </span>
-              <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-primary/50 to-primary/20 rounded-full block"></span>
+              <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-foreground/20 rounded-full block"></span>
             </span>
             ,{" "}
             <span className="relative inline-block">
-              <span className="font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+              <span className="font-bold text-foreground">
                 trackable
               </span>
-              <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-primary/50 to-primary/20 rounded-full block"></span>
+              <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-foreground/20 rounded-full block"></span>
             </span>{" "}
             short links
           </p>
@@ -68,28 +68,23 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row gap-6 items-center animate-in fade-in-0 slide-in-from-bottom-4 duration-1200 delay-500">
           <Button
             size="lg"
-            className="group relative px-10 py-4 text-lg font-bold shadow-2xl hover:shadow-primary/20 transition-all duration-500 hover:scale-110 bg-gradient-to-r from-primary via-primary to-primary/90 hover:from-primary/90 hover:via-primary hover:to-primary overflow-hidden"
+            className="group px-10 py-6 text-lg font-semibold"
             onClick={() => navigate("/signup")}
           >
-            <span className="relative z-10 flex items-center gap-2">
-              Get Started Free
-              <svg
-                className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
-            </span>
-            <div className="absolute inset-0 -top-px overflow-hidden rounded-lg">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_ease-in-out] group-hover:translate-x-full transition-transform duration-1000"></div>
-            </div>
+            Get Started Free
+            <svg
+              className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
+              />
+            </svg>
           </Button>
         </div>
       </div>
