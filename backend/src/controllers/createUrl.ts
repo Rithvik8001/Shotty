@@ -30,7 +30,7 @@ const redirectWithWarning = (
   req: Request,
   res: Response,
   targetUrl: string,
-  validation: UrlValidationResult,
+  validation: UrlValidationResult
 ) => {
   // Create a warning page HTML response
   const warningPage = `
@@ -160,9 +160,13 @@ const redirectWithWarning = (
             <div class="warnings-list">
                 <strong>Security Warnings:</strong>
                 <ul>
-                    ${validation.warnings.map((warning) => `<li>${warning}</li>`).join("")}
+                    ${validation.warnings
+                      .map((warning) => `<li>${warning}</li>`)
+                      .join("")}
                 </ul>
-                <p>Risk Level: <span class="risk-level risk-${validation.riskLevel}">${validation.riskLevel}</span></p>
+                <p>Risk Level: <span class="risk-level risk-${
+                  validation.riskLevel
+                }">${validation.riskLevel}</span></p>
             </div>
 
             <p class="warning-text">
@@ -197,7 +201,7 @@ export const getAllUrls = async (req: Request, res: Response) => {
     return sendSuccessResponse(
       res,
       200,
-      createSuccessResponse("URLs retrieved successfully", urls, urls.length),
+      createSuccessResponse("URLs retrieved successfully", urls, urls.length)
     );
   } catch (error) {
     const apiError = handleDatabaseError(error);
@@ -217,7 +221,7 @@ export const deleteUrl = async (req: Request, res: Response) => {
     if (!deletedUrl) {
       const apiError = createErrorResponse(
         "URL not found or you don't have permission to delete it",
-        "URL_NOT_FOUND",
+        "URL_NOT_FOUND"
       );
       return sendErrorResponse(res, 404, apiError);
     }
@@ -225,7 +229,7 @@ export const deleteUrl = async (req: Request, res: Response) => {
     return sendSuccessResponse(
       res,
       200,
-      createSuccessResponse("URL deleted successfully"),
+      createSuccessResponse("URL deleted successfully")
     );
   } catch (error) {
     const apiError = handleDatabaseError(error);
@@ -251,13 +255,13 @@ export const editUrl = async (req: Request, res: Response) => {
         userId: req.user?.userId,
       },
       { originalUrl },
-      { new: true, select: "originalUrl shortUrl clicks createdAt updatedAt" },
+      { new: true, select: "originalUrl shortUrl clicks createdAt updatedAt" }
     );
 
     if (!updatedUrl) {
       const apiError = createErrorResponse(
         "URL not found or you don't have permission to edit it",
-        "URL_NOT_FOUND",
+        "URL_NOT_FOUND"
       );
       return sendErrorResponse(res, 404, apiError);
     }
@@ -265,7 +269,7 @@ export const editUrl = async (req: Request, res: Response) => {
     return sendSuccessResponse(
       res,
       200,
-      createSuccessResponse("URL updated successfully", updatedUrl),
+      createSuccessResponse("URL updated successfully", updatedUrl)
     );
   } catch (error) {
     const apiError = handleDatabaseError(error);
@@ -280,13 +284,13 @@ export const redirectUrl = async (req: Request, res: Response) => {
     const urlDoc = await Url.findOneAndUpdate(
       { shortUrl },
       { $inc: { clicks: 1 } },
-      { new: true },
+      { new: true }
     );
 
     if (!urlDoc) {
       const apiError = createErrorResponse(
         "Short URL not found",
-        "SHORT_URL_NOT_FOUND",
+        "SHORT_URL_NOT_FOUND"
       );
       return sendErrorResponse(res, 404, apiError);
     }
@@ -297,7 +301,7 @@ export const redirectUrl = async (req: Request, res: Response) => {
     if (!validation.isValid) {
       const apiError = createErrorResponse(
         "Invalid redirect URL detected",
-        "INVALID_REDIRECT_URL",
+        "INVALID_REDIRECT_URL"
       );
       return sendErrorResponse(res, 400, apiError);
     }
@@ -348,7 +352,7 @@ export const createUrl = async (req: Request, res: Response) => {
     if (!isUnique) {
       const apiError = createErrorResponse(
         "Unable to generate unique short URL. Please try again.",
-        "SHORT_URL_GENERATION_FAILED",
+        "SHORT_URL_GENERATION_FAILED"
       );
       return sendErrorResponse(res, 500, apiError);
     }
@@ -366,7 +370,7 @@ export const createUrl = async (req: Request, res: Response) => {
         shortUrl: newUrl.shortUrl,
         originalUrl: newUrl.originalUrl,
         clicks: newUrl.clicks,
-      }),
+      })
     );
   } catch (error) {
     const apiError = handleDatabaseError(error);

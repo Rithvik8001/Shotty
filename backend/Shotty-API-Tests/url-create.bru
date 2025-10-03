@@ -1,0 +1,22 @@
+meta {
+  name: /url/create
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:3000/url/create
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "originalUrl":"https://www.apple.com/"
+    
+  }
+}
+
+settings {
+  encodeUrl: true
+}
